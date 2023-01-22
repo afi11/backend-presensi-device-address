@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend_presensi_device_address/pkg/auth"
 	"backend_presensi_device_address/pkg/common/db"
 	"backend_presensi_device_address/pkg/users"
 
@@ -19,6 +20,7 @@ func main() {
 	dbHandler := db.Init(dbUrl)
 
 	users.UserRoutes(router, dbHandler)
+	auth.AuthRoutes(router, dbHandler)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
