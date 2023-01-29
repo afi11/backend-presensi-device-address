@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 type RegisterInput struct {
@@ -48,21 +47,50 @@ func (h handler) RegisterUserEmployee(ctx *gin.Context) {
 	user.Username = body.Username
 	user.Password = setHashedPassword(body.Password)
 
-	h.DB.Transaction(func(tx *gorm.DB) error {
-		pegawai := models.Pegawai{NIK: user.NIK, Nama: user.Nama, Email: user.Email, Telephone: user.Telephone, Alamat: user.Alamat, DivisiID: user.DivisiID}
-		insertPegawai := tx.Create(&pegawai)
-		if insertPegawai.Error != nil {
-			return insertPegawai.Error
+	tx := h.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
 		}
+	}()
 
-		user := models.User{Username: user.Username, Password: user.Password, Role: "pegawai", PegawaiID: pegawai.ID}
-		insertUser := tx.Create(&user)
-		if insertUser.Error != nil {
-			return insertUser.Error
-		}
+	if err := tx.Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
 
-		return nil
-	})
+	pegawai := models.Pegawai{NIK: user.NIK, Nama: user.Nama, Email: user.Email, Telephone: user.Telephone, Alamat: user.Alamat, DivisiID: user.DivisiID}
+	if err := tx.Create(&pegawai).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	dtUser := models.User{Username: user.Username, Password: user.Password, Role: "pegawai", PegawaiID: pegawai.ID}
+	if err := tx.Create(&dtUser).Error; err != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	tx.Commit()
+
+	// Another Version
+	// h.DB.Transaction(func(tx *gorm.DB) error {
+	// 	pegawai := models.Pegawai{NIK: user.NIK, Nama: user.Nama, Email: user.Email, Telephone: user.Telephone, Alamat: user.Alamat, DivisiID: user.DivisiID}
+	// 	insertPegawai := tx.Create(&pegawai)
+	// 	if insertPegawai.Error != nil {
+	// 		return insertPegawai.Error
+	// 	}
+
+	// 	user := models.User{Username: user.Username, Password: user.Password, Role: "pegawai", PegawaiID: pegawai.ID}
+	// 	insertUser := tx.Create(&user)
+	// 	if insertUser.Error != nil {
+	// 		return insertUser.Error
+	// 	}
+
+	// 	return nil
+	// })
 
 	ctx.JSON(http.StatusCreated, gin.H{"message": "registration success"})
 }
