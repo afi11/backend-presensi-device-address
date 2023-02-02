@@ -4,6 +4,7 @@ import (
 	"backend_presensi_device_address/pkg/auth"
 	"backend_presensi_device_address/pkg/common/db"
 	"backend_presensi_device_address/pkg/divisi"
+	"backend_presensi_device_address/pkg/jadwal"
 	"backend_presensi_device_address/pkg/users"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,7 @@ func main() {
 	users.UserRoutes(router, dbHandler)
 	auth.AuthRoutes(router, dbHandler)
 	divisi.DivisiRoutes(router, dbHandler)
+	jadwal.JadwalRoutes(router, dbHandler)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

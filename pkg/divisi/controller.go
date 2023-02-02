@@ -1,6 +1,8 @@
 package divisi
 
 import (
+	"backend_presensi_device_address/pkg/common/middlewares"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -15,6 +17,7 @@ func DivisiRoutes(router *gin.Engine, db *gorm.DB) {
 	}
 
 	routes := router.Group("/divisi")
+	routes.Use(middlewares.JwtAuthMiddleware())
 	routes.GET("/all-divisi", h.GetAllDivisi)
 	routes.POST("/create-divisi", h.SaveDivisi)
 	routes.GET("/get-divisi/:id", h.GetDivisi)
