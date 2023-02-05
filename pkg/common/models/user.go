@@ -6,10 +6,11 @@ import (
 
 type User struct {
 	gorm.Model
-	Username  string `gorm:"size:255;not null;unique" json:"username"`
-	Password  string `gorm:"size:100;not null;" json:"password"`
-	Role      string `gorm:"size:10;not null;" json:"role"`
-	PegawaiID uint   `gorm:"null" json:"pegawai_id"`
+	Username  string  `gorm:"size:255;not null;unique" json:"username"`
+	Password  string  `gorm:"size:100;not null;" json:"password"`
+	Role      string  `gorm:"size:10;not null;" json:"role"`
+	PegawaiID uint    `gorm:"null" json:"pegawai_id"`
+	Pegawai   Pegawai `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type DataUser struct {

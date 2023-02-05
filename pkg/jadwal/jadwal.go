@@ -146,7 +146,6 @@ func (h handler) ImportJadwal(ctx *gin.Context) {
 			continue
 		}
 
-		// Create new person and add to persons array
 		user_id, _ := strconv.ParseInt(record[headerMap["UserID"]], 10, 0)
 		jadwal := models.Jadwal{Tanggal: record[headerMap["Tanggal"]],
 			JamMulaiMasuk: record[headerMap["JamMulaiMasuk"]], JamAkhirMasuk: record[headerMap["JamAkhirMasuk"]],
