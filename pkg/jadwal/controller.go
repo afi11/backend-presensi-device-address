@@ -19,5 +19,8 @@ func JadwalRoutes(router *gin.Engine, db *gorm.DB) {
 	routes := router.Group("/jadwal")
 	routes.Use(middlewares.JwtAuthMiddleware())
 	routes.POST("/create-jadwal", h.SaveJadwal)
+	routes.GET("/get-jadwal/:id", h.GetJadwal)
+	routes.PUT("/update-jadwal/:id", h.UpdateJadwal)
+	routes.DELETE("/delete-jadwal/:id", h.DeleteJadwal)
 	routes.POST("/import-jadwal", h.ImportJadwal)
 }
