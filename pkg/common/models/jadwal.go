@@ -10,4 +10,5 @@ type Jadwal struct {
 	JamMulaiPulang string `gorm:"default:TIME" json:"jam_mulai_pulang"`
 	JamAkhirPulang string `gorm:"default:TIME" json:"jam_akhir_pulang"`
 	UserId         int64  `gorm:"null" json:"user_id"`
+	User           User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

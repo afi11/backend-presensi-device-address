@@ -10,4 +10,5 @@ type Pegawai struct {
 	Telephone string `gorm:"size:15;not null;" json:"telephone"`
 	Alamat    string `gorm:"size:15;not null;" json:"alamat"`
 	DivisiID  uint32 `gorm:"null" json:"divisi_id"`
+	Divisi    Divisi `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

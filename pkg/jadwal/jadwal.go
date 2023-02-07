@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,6 +47,55 @@ func (h handler) SaveJadwal(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"message": "schedule successfull to created"})
 }
 
+func (h handler) GetJadwal(ctx *gin.Context) {
+	var jadwal models.Jadwal
+	if err := h.DB.Where("id = ?", ctx.Param("id")).First(&jadwal); err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "Data is not found!!"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"data": jadwal})
+}
+
+func (h handler) UpdateJadwal(ctx *gin.Context) {
+	body := JadwalInput{}
+
+	if err := ctx.BindJSON(&body); err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	var jadwal models.Jadwal
+
+	if err := h.DB.Where("id = ?", ctx.Param("id")).First(&jadwal).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "Data is not found!!"})
+		return
+	}
+
+	jadwal.Tanggal = body.Tanggal
+	jadwal.JamMulaiMasuk = body.JamMulaiMasuk
+	jadwal.JamAkhirMasuk = body.JamAkhirMasuk
+	jadwal.JamMulaiPulang = body.JamMulaiPulang
+	jadwal.JamAkhirPulang = body.JamAkhirPulang
+	jadwal.UserId = body.UserId
+
+	h.DB.Updates(&jadwal)
+	ctx.JSON(http.StatusOK, gin.H{"message": "data schedule successfull to be updated"})
+
+}
+
+func (h handler) DeleteJadwal(ctx *gin.Context) {
+	var jadwal models.Jadwal
+
+	if err := h.DB.Where("id = ?", ctx.Param("id")).First(&jadwal).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "Data is not found!!"})
+	}
+
+	h.DB.Delete(&jadwal)
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "data schedule successfull to be deleted"})
+
+}
+
 func (h handler) ImportJadwal(ctx *gin.Context) {
 
 	file, _ := ctx.FormFile("file")
@@ -69,44 +119,43 @@ func (h handler) ImportJadwal(ctx *gin.Context) {
 
 	// Read File into a Variable
 	lines := csv.NewReader(csvFile)
+	lines.Comma = '\t'
+	lines.Comma = ';'
+	lines.Comma = ','
 	isFirstRow := true
 	headerMap := make(map[string]int)
 	for {
-		//Read row
+		// Read row
 		record, err := lines.Read()
 
-		//Stop at EOF.
+		// Stop at EOF.
 		if err == io.EOF {
 			break
 		}
 
-		//Handle first row case
+		// Handle first row case
 		if isFirstRow {
 			isFirstRow = false
 
-			//Add mapping: Column/property name --> record index
+			// Add mapping: Column/property name --> record index
 			for i, v := range record {
 				headerMap[v] = i
 			}
 
-			//Skip next code
+			// Skip next code
 			continue
 		}
 
-		fmt.Println(record[headerMap["Tanggal"]])
-
-		// Create new person and add to persons array
-		//user_id, _ := strconv.ParseInt(record[headerMap["UserID"]], 10, 0)
-		// jadwal := models.Jadwal{Tanggal: record[headerMap["Tanggal"]],
-		// 	JamMulaiMasuk: record[headerMap["JamMulaiMasuk"]], JamAkhirMasuk: record[headerMap["JamAkhirMasuk"]],
-		// 	JamMulaiPulang: record[headerMap["JamMulaiPulang"]], JamAkhirPulang: record[headerMap["JamAkhirPulang"]],
-		// 	UserId: user_id,
-		// }
-		// if err := h.DB.Create(&jadwal).Error; err != nil {
-		// 	ctx.JSON(http.StatusInternalServerError, err)
-		// 	return
-		// }
-		//}
+		user_id, _ := strconv.ParseInt(record[headerMap["UserID"]], 10, 0)
+		jadwal := models.Jadwal{Tanggal: record[headerMap["Tanggal"]],
+			JamMulaiMasuk: record[headerMap["JamMulaiMasuk"]], JamAkhirMasuk: record[headerMap["JamAkhirMasuk"]],
+			JamMulaiPulang: record[headerMap["JamMulaiPulang"]], JamAkhirPulang: record[headerMap["JamAkhirPulang"]],
+			UserId: user_id,
+		}
+		if err := h.DB.Create(&jadwal).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"message": "schedule successfull to import"})

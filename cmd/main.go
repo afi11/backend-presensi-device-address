@@ -3,6 +3,7 @@ package main
 import (
 	"backend_presensi_device_address/pkg/auth"
 	"backend_presensi_device_address/pkg/common/db"
+	"backend_presensi_device_address/pkg/deviceaddress"
 	"backend_presensi_device_address/pkg/divisi"
 	"backend_presensi_device_address/pkg/jadwal"
 	"backend_presensi_device_address/pkg/users"
@@ -25,6 +26,7 @@ func main() {
 	auth.AuthRoutes(router, dbHandler)
 	divisi.DivisiRoutes(router, dbHandler)
 	jadwal.JadwalRoutes(router, dbHandler)
+	deviceaddress.DeviceAddressRoutes(router, dbHandler)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
