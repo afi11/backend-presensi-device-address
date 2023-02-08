@@ -3,6 +3,7 @@ module backend_presensi_device_address
 go 1.19
 
 require (
+	github.com/csimplestring/go-csv v0.0.0-20180328183906-5b8b3cd94f2c // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -48,5 +49,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/postgres v1.4.6 // indirect
-	gorm.io/gorm v1.24.3 // indirect
+	gorm.io/gorm v1.24.5 // indirect
 )

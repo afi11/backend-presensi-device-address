@@ -128,9 +128,10 @@ func (h handler) ImportDeviceAddress(ctx *gin.Context) {
 
 	// Read File into a Variable
 	lines := csv.NewReader(csvFile)
-	lines.Comma = '\t'
+	// Untuk Custom Format Delimiter, Untuk Default comma
+	//lines.Comma = '\t'
 	lines.Comma = ';'
-	lines.Comma = ','
+	//lines.Comma = ','
 	isFirstRow := true
 	headerMap := make(map[string]int)
 	for {
@@ -154,6 +155,8 @@ func (h handler) ImportDeviceAddress(ctx *gin.Context) {
 			// Skip next code
 			continue
 		}
+
+		fmt.Println(record[headerMap["UserID"]])
 
 		user_id, _ := strconv.ParseInt(record[headerMap["UserID"]], 10, 0)
 		deviceAddress := models.DeviceAddress{IpAddress: record[headerMap["IPAddress"]],
