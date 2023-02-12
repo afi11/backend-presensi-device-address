@@ -48,7 +48,6 @@ func (h handler) SaveDeviceAddress(ctx *gin.Context) {
 	var deviceAddress models.DeviceAddress
 
 	deviceAddress.IpAddress = body.IpAddress
-	deviceAddress.MacAddress = body.MacAddress
 	deviceAddress.UserId = body.UserID
 
 	insertDeviceAddress := h.DB.Create(&deviceAddress)
@@ -76,7 +75,6 @@ func (h handler) UpdateDeviceAddress(ctx *gin.Context) {
 	}
 
 	deviceAddress.IpAddress = body.IpAddress
-	deviceAddress.MacAddress = body.MacAddress
 	deviceAddress.UserId = body.UserID
 
 	updateDeviceAddress := h.DB.Updates(&deviceAddress)
@@ -160,8 +158,7 @@ func (h handler) ImportDeviceAddress(ctx *gin.Context) {
 
 		user_id, _ := strconv.ParseInt(record[headerMap["UserID"]], 10, 0)
 		deviceAddress := models.DeviceAddress{IpAddress: record[headerMap["IPAddress"]],
-			MacAddress: record[headerMap["MACAddress"]],
-			UserId:     user_id,
+			UserId: user_id,
 		}
 		if err := h.DB.Create(&deviceAddress).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
