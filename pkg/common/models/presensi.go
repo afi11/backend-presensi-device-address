@@ -6,10 +6,11 @@ import (
 
 type Presensi struct {
 	gorm.Model
-	JamMasuk        string        `gorm:"size:100;not null" json:"jam_masuk"`
-	JamPulang       string        `gorm:"default:TIME;not null" json:"jam_pulang"`
-	TelatMasuk      string        `gorm:"default:TIME;not null" json:"telat_masuk"`
-	TelatPulang     string        `gorm:"default:TIME;not null" json:"telat_pulang"`
+	TanggalPresensi string        `gorm:"not null" json:"tanggal_presensi"`
+	JamMasuk        string        `gorm:"not null" json:"jam_masuk"`
+	JamPulang       string        `gorm:"not null" json:"jam_pulang"`
+	TelatMasuk      string        `gorm:"not null" json:"telat_masuk"`
+	TelatPulang     string        `gorm:"not null" json:"telat_pulang"`
 	IsTelat         int           `gorm:"not null" json:"is_telat"`
 	UserID          int64         `gorm:"not null" json:"user_id"`
 	JadwalID        int64         `gorm:"not null" json:"jadwal_id"`

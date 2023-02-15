@@ -48,3 +48,18 @@ func FormatCorrectTime(timeInput time.Duration) string {
 	var result = fmt.Sprint(hour, ":", minute, ":00")
 	return result
 }
+
+func TimeIn(t time.Time, name string) (time.Time, error) {
+	loc, err := time.LoadLocation(name)
+	if err == nil {
+		t = t.In(loc)
+	}
+	return t, err
+}
+
+func GetDateNow() string {
+	now, _ := TimeIn(time.Now(), "Asia/Jakarta")
+
+	var dateNow = now.Format("2006-01-02")
+	return dateNow
+}

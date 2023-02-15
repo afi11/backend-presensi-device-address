@@ -18,5 +18,6 @@ func PresensiRoutes(router *gin.Engine, db *gorm.DB) {
 
 	routes := router.Group("/presensi")
 	routes.Use(middlewares.JwtAuthMiddleware())
+	routes.GET("/get-time-presensi", h.GetTimePresensi)
 	routes.POST("/save-presensi", h.SavePresensi)
 }
