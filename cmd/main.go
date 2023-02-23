@@ -9,6 +9,7 @@ import (
 	"backend_presensi_device_address/pkg/presensi"
 	"backend_presensi_device_address/pkg/users"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -21,6 +22,10 @@ func main() {
 	dbUrl := viper.Get("DB_URL").(string)
 
 	router := gin.Default()
+
+	// Cors Handler
+	router.Use(cors.Default())
+
 	dbHandler := db.Init(dbUrl)
 
 	users.UserRoutes(router, dbHandler)
