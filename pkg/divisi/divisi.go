@@ -2,7 +2,9 @@ package divisi
 
 import (
 	"backend_presensi_device_address/pkg/common/models"
+	"backend_presensi_device_address/pkg/common/utils/pagination"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,9 +15,21 @@ type DivisiInput struct {
 
 func (h handler) GetAllDivisi(ctx *gin.Context) {
 	var divisis []models.Divisi
-	h.DB.Find(&divisis)
+	var dataPagination pagination.Pagination
 
-	ctx.JSON(http.StatusOK, gin.H{"data": divisis})
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	sort := ctx.Query("sort") + " " + ctx.Query("order")
+
+	dataPagination.Limit = limit
+	dataPagination.Page = page
+	dataPagination.Sort = sort
+
+	h.DB.Scopes(pagination.Paginate(divisis, &dataPagination, h.DB)).Find(&divisis)
+
+	dataPagination.Rows = divisis
+
+	ctx.JSON(http.StatusOK, gin.H{"data": dataPagination})
 }
 
 func (h handler) SaveDivisi(ctx *gin.Context) {
