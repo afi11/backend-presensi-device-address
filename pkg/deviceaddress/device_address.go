@@ -2,6 +2,7 @@ package deviceaddress
 
 import (
 	"backend_presensi_device_address/pkg/common/models"
+	"backend_presensi_device_address/pkg/common/utils/pagination"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -22,9 +23,23 @@ type DeviceAddressInput struct {
 
 func (h handler) GetAllAddress(ctx *gin.Context) {
 	var deviceAddress []models.DeviceAddress
-	h.DB.Preload("User.Pegawai.Divisi").Preload(clause.Associations).Find(&deviceAddress)
+	var dataPagination pagination.Pagination
 
-	ctx.JSON(http.StatusOK, gin.H{"data": deviceAddress})
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	sort := ctx.Query("sort") + " " + ctx.Query("order")
+
+	dataPagination.Limit = limit
+	dataPagination.Page = page
+	dataPagination.Sort = sort
+
+	h.DB.Scopes(pagination.PaginateWithPreload("User.Pegawai.Divisi", deviceAddress, &dataPagination, h.DB)).Find(&deviceAddress)
+	// No Pagination
+	//h.DB.Preload("User.Pegawai.Divisi").Preload(clause.Associations).Find(&deviceAddress)
+
+	dataPagination.Rows = deviceAddress
+
+	ctx.JSON(http.StatusOK, gin.H{"data": dataPagination})
 }
 
 func (h handler) GetAddress(ctx *gin.Context) {

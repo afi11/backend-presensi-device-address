@@ -2,6 +2,7 @@ package jadwal
 
 import (
 	"backend_presensi_device_address/pkg/common/models"
+	"backend_presensi_device_address/pkg/common/utils/pagination"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -48,12 +49,28 @@ func (h handler) SaveJadwal(ctx *gin.Context) {
 }
 
 func (h handler) GetJadwal(ctx *gin.Context) {
-	var jadwal models.Jadwal
-	if err := h.DB.Where("id = ?", ctx.Param("id")).First(&jadwal); err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Data is not found!!"})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"data": jadwal})
+	// var jadwal models.Jadwal
+	// if err := h.DB.Where("id = ?", ctx.Param("id")).First(&jadwal); err != nil {
+	// 	ctx.JSON(http.StatusNotFound, gin.H{"error": "Data is not found!!"})
+	// 	return
+	// }
+
+	var jadwal []models.Jadwal
+	var dataPagination pagination.Pagination
+
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	page, _ := strconv.Atoi(ctx.Query("page"))
+	sort := ctx.Query("sort") + " " + ctx.Query("order")
+
+	dataPagination.Limit = limit
+	dataPagination.Page = page
+	dataPagination.Sort = sort
+
+	h.DB.Scopes(pagination.PaginateWithCondition("User.Pegawai.Divisi", "user_id", ctx.Param("id"), jadwal, &dataPagination, h.DB)).First(&jadwal)
+
+	dataPagination.Rows = jadwal
+
+	ctx.JSON(http.StatusOK, gin.H{"data": dataPagination})
 }
 
 func (h handler) UpdateJadwal(ctx *gin.Context) {
@@ -119,9 +136,9 @@ func (h handler) ImportJadwal(ctx *gin.Context) {
 
 	// Read File into a Variable
 	lines := csv.NewReader(csvFile)
-	lines.Comma = '\t'
+	//lines.Comma = '\t'
 	lines.Comma = ';'
-	lines.Comma = ','
+	//lines.Comma = ','
 	isFirstRow := true
 	headerMap := make(map[string]int)
 	for {
