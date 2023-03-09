@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"backend_presensi_device_address/pkg/auth"
 	"backend_presensi_device_address/pkg/common/db"
 	"backend_presensi_device_address/pkg/deviceaddress"
@@ -23,9 +24,6 @@ func main() {
 
 	router := gin.Default()
 
-	// Cors Handler
-	router.Use(cors.Default())
-
 	dbHandler := db.Init(dbUrl)
 
 	users.UserRoutes(router, dbHandler)
@@ -41,6 +39,19 @@ func main() {
 			"dbUrl": dbUrl,
 		})
 	})
+
+		// Cors Handler
+		router.Use(cors.New(cors.Config{
+			AllowOrigins:     []string{"http://localhost:5173"},
+			AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE"},
+			AllowHeaders:     []string{"Origin"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			AllowOriginFunc: func(origin string) bool {
+			  return origin == "https://github.com"
+			},
+			MaxAge: 12 * time.Hour,
+		  }))
 
 	router.Run(port)
 
