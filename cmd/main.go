@@ -1,16 +1,15 @@
 package main
 
 import (
-	"time"
 	"backend_presensi_device_address/pkg/auth"
 	"backend_presensi_device_address/pkg/common/db"
+	"backend_presensi_device_address/pkg/common/middlewares"
 	"backend_presensi_device_address/pkg/deviceaddress"
 	"backend_presensi_device_address/pkg/divisi"
 	"backend_presensi_device_address/pkg/jadwal"
 	"backend_presensi_device_address/pkg/presensi"
 	"backend_presensi_device_address/pkg/users"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -26,6 +25,8 @@ func main() {
 
 	dbHandler := db.Init(dbUrl)
 
+	router.Use(middlewares.CorsMiddleware())
+
 	users.UserRoutes(router, dbHandler)
 	auth.AuthRoutes(router, dbHandler)
 	divisi.DivisiRoutes(router, dbHandler)
@@ -39,19 +40,6 @@ func main() {
 			"dbUrl": dbUrl,
 		})
 	})
-
-		// Cors Handler
-		router.Use(cors.New(cors.Config{
-			AllowOrigins:     []string{"http://localhost:5173"},
-			AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE"},
-			AllowHeaders:     []string{"Origin"},
-			ExposeHeaders:    []string{"Content-Length"},
-			AllowCredentials: true,
-			AllowOriginFunc: func(origin string) bool {
-			  return origin == "https://github.com"
-			},
-			MaxAge: 12 * time.Hour,
-		  }))
 
 	router.Run(port)
 
