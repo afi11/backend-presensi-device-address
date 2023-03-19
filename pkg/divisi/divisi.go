@@ -19,13 +19,14 @@ func (h handler) GetAllDivisi(ctx *gin.Context) {
 
 	limit, _ := strconv.Atoi(ctx.Query("limit"))
 	page, _ := strconv.Atoi(ctx.Query("page"))
+	search := ctx.Query("search")
 	sort := ctx.Query("sort") + " " + ctx.Query("order")
 
 	dataPagination.Limit = limit
 	dataPagination.Page = page
 	dataPagination.Sort = sort
 
-	h.DB.Scopes(pagination.Paginate(divisis, &dataPagination, h.DB)).Find(&divisis)
+	h.DB.Scopes(pagination.Paginate("nama_divisi", search, divisis, &dataPagination, h.DB)).Find(&divisis)
 
 	dataPagination.Rows = divisis
 
